@@ -1,0 +1,35 @@
+name: Upload to PIP repository
+on:
+  release: 
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.6]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+              
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt 
+
+      - name: Run unit tests
+        run: python -m pytest
+
+      - name: Build and Upload to PyPI
+        run: |
+            pip install twine wheel
+            python setup.py sdist bdist_wheel
+            python -m twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TWINE_TOKEN }}
