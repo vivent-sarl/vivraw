@@ -35,12 +35,11 @@ if __name__ == "__main__":
             df = pd.DataFrame(
                 {"timestamp": pd.date_range(start, stop, mv.shape[0]), "mV": mv}
             )
-
+            
             if cli_input_params["resolution"] == "5min":
                 df.set_index("timestamp", inplace=True)
                 df = df.resample("5T").mean()
                 df.reset_index(inplace=True)
-
 
             write_mv_data_to_parquet(
                 shard=df["mV"].to_numpy(),
